@@ -1,0 +1,2 @@
+# DaniGeneratorTN
+TaikoNautesの段位道場jsonを作成する
