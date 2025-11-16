@@ -1,2 +1,3 @@
 # DaniGeneratorTN
-TaikoNautesの段位道場jsonを作成する
+TaikoNautsの段位道場jsonを作成する
+https://miokamioka.github.io/DaniGeneratorTN/
