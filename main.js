@@ -56,15 +56,11 @@ document.getElementById('theme_cotinuous_03').onchange = function () {
 
 
 document.getElementById('generateJsonBtn').onclick = function () {
-    // --- ヘルパー関数 ---
-
-    // radioボタンの値を取得
     function getRadioValue(name) {
         const ele = document.querySelector(`input[name="${name}"]:checked`);
         return ele ? ele.value : null;
     }
 
-    // input要素の値を取得 (ファイル、テキスト、数値など)
     function getValue(name) {
         const ele = document.querySelector(`input[name="${name}"]`);
         if (!ele) return null;
@@ -77,13 +73,11 @@ document.getElementById('generateJsonBtn').onclick = function () {
             return parseInt(ele.value, 10) || 0;
         }
         if (ele.type === 'range') {
-            // rangeは常に値を持つが、念のためparseFloat
             return parseFloat(ele.value);
         }
         return ele.value;
     }
 
-    // checkboxがチェックされているか (true/false) ※name属性で検索
     function isChecked(name) {
         const ele = document.querySelector(`input[name="${name}"]`);
         return ele ? ele.checked : false;
@@ -101,9 +95,8 @@ document.getElementById('generateJsonBtn').onclick = function () {
         }
     }
 
-    // テーマジャンルマッピング (good -> Good, parfect -> Perfect)
     function mapThemeGenre(value) {
-        if (!value) return ""; // 未選択の場合
+        if (!value) return "";
         if (value === 'parfect') return 'Perfect';
         // 1文字目を大文字化
         return value.charAt(0).toUpperCase() + value.slice(1);
@@ -139,8 +132,6 @@ document.getElementById('generateJsonBtn').onclick = function () {
             mapThemeGenre(getRadioValue('theme_genre_03'))
         ],
         theme_continuous: [
-            // HTML側のタイポ (cotinuous) に合わせています
-            // ★修正点: ここは isChecked ではなく、id で直接参照します
             !document.getElementById('theme_cotinuous_01').checked,
             !document.getElementById('theme_cotinuous_02').checked,
             !document.getElementById('theme_cotinuous_03').checked
@@ -149,14 +140,12 @@ document.getElementById('generateJsonBtn').onclick = function () {
             red: getValue('gauge_red')+".0",
             gold: getValue('gauge_gold')+".0"
         },
-        theme_Borders: [] // 動的に構築するために空配列で初期化
+        theme_Borders: []
     };
 
     // --- theme_Borders の構築ロジック ---
     for (let i = 1; i <= 3; i++) {
         const i_str = String(i).padStart(2, '0'); // "01", "02", "03"
-        
-        // ★修正点: isChecked(name) ではなく、getElementById(id) でチェックボックスの状態を取得
         const isIndividualCheckbox = document.getElementById(`theme_cotinuous_${i_str}`);
         const isIndividual = isIndividualCheckbox ? isIndividualCheckbox.checked : false;
         
@@ -164,13 +153,11 @@ document.getElementById('generateJsonBtn').onclick = function () {
             values: []
         };
 
-        // 1曲目の値（共通条件・個別条件どちらの場合も必須）
         borderData.values.push({
             red: getValue(`red_number_${i_str}`),
             gold: getValue(`gold_number_${i_str}`)
         });
 
-        // "個別条件にする" がチェックされている場合のみ、2曲目と3曲目を追加
         if (isIndividual) {
             // 2曲目の値
             borderData.values.push({
@@ -184,12 +171,22 @@ document.getElementById('generateJsonBtn').onclick = function () {
             });
         }
         
-        // 構築した borderData を result.theme_Borders に追加
         result.theme_Borders.push(borderData);
     }
-
-    // 結果を <pre> タグに表示
-    document.getElementById('jsonResult').textContent = JSON.stringify(result, null, 2);
+    const jsonString = JSON.stringify(result, null, 2);
+    // デバッグ用の表示
+    document.getElementById('jsonResult').textContent = jsonString;
+    // BlobからURLを生成し、クリックイベントを発生させる
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Dan.json';
+    document.body.appendChild(a);
+    a.click();
+    // aタグとURLを削除
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 };
 
 
