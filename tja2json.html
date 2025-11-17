@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <title>TaikøNauts 段位tjaからjsonに変換</title>
+    <meta property="og:title" content="TaikøNauts 段位tjaからjsonに変換" />
+    <meta property="og:description"
+        content="TJAP3-DRW/OpTk/TNDEで使われていたtjaファイルでの段位フォーマットをTaikøNautsで使用するDan.jsonファイルに変換します。" />
+    <link rel="stylesheet" href="main.css">
+    <script src="main.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="menu-wrapper">
+        <input type="checkbox" id="menu-toggle" hidden>
+        <label class="menu-icon" for="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+
+        <div class="overlay"></div>
+
+        <nav class="menu">
+            <ul>
+                <li><a href="index.html">TaikøNauts 段位道場生成ツール</a></li>
+                <li><a href="tja2json.html">段位tja to Dan.json</a></li>
+                <li><a href="https://github.com/miokamioka/DaniGeneratorTN">github</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h2>TaikøNauts 段位tjaからjsonに変換</h2>
+        <p>TJAP3-DRW/OpTk/TNDEで使われていたtjaファイルでの段位フォーマットをTaikøNautsで使用するDan.jsonファイルに変換します。</p>
+        <form id="tjaForm">
+            <input type="file" id="tjaFile" accept=".tja" required><br>
+        <input type="submit" value="生成する">
+        </form>
+
+        <h2>JSON:</h2>
+        <pre id="output">結果がここに表示されます...</pre>
+        <script src="tja.js"></script>
+    </div>
+</body>
+
+</html>

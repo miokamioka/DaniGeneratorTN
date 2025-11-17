@@ -5,119 +5,138 @@
     <meta charset="utf-8">
     <title>TaikøNauts 段位道場生成ツール</title>
     <meta property="og:title" content="TaikøNauts 段位道場生成ツール" />
-    <meta
-        property="og:description"
-        content="TaikøNautsの段位道場で使用するDan.jsonファイルを生成します。"
-    />
+    <meta property="og:description" content="TaikøNautsの段位道場で使用するDan.jsonファイルを生成します。" />
+    <link rel="stylesheet" href="main.css">
     <script src="main.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <h2>TaikøNauts 段位道場作成ツール</h2>
-    <p>TaikøNautsの段位道場で使用するDan.jsonファイルを生成します。</p>
-    <form action="" method="get">
-        <div>
-            段位名:
-            <input type="text" name="dani_title" size="30">
-            <hr>
-        </div>
-        <div>
-            使用するTJAファイル<br>
-            1曲目:<input type="file" name="tja_01" accept=".tja,.osz">
-            難易度:
-            <input type="radio" name="diff_01" value="easy">かんたん
-            <input type="radio" name="diff_01" value="normal">ふつう
-            <input type="radio" name="diff_01" value="hard">むずかしい
-            <input type="radio" name="diff_01" value="master">おに
-            <input type="radio" name="diff_01" value="another">裏譜面<br>
-            ジャンル:<input list="genre_name" name="genrename_01">
-            <input type="checkbox" name="hiddencheck_01" value="hiddencheck_01">隠し曲にする
-            <p />
-            2曲目:<input type="file" name="tja_02" accept=".tja,.osz">
-            難易度:
-            <input type="radio" name="diff_02" value="easy">かんたん
-            <input type="radio" name="diff_02" value="normal">ふつう
-            <input type="radio" name="diff_02" value="hard">むずかしい
-            <input type="radio" name="diff_02" value="master">おに
-            <input type="radio" name="diff_02" value="another">裏譜面<br>
-            ジャンル:<input list="genre_name" name="genrename_02">
-            <input type="checkbox" name="hiddencheck_02" value="hiddencheck_02">隠し曲にする
-            <p />
-            3曲目:<input type="file" name="tja_03" accept=".tja,.osz">
-            難易度:
-            <input type="radio" name="diff_03" value="easy">かんたん
-            <input type="radio" name="diff_03" value="normal">ふつう
-            <input type="radio" name="diff_03" value="hard">むずかしい
-            <input type="radio" name="diff_03" value="master">おに
-            <input type="radio" name="diff_03" value="another">裏譜面<br>
-            ジャンル:<input list="genre_name" name="genrename_03">
-            <input type="checkbox" name="hiddencheck_03" value="hiddencheck_03">隠し曲にする
+    <div class="menu-wrapper">
+        <input type="checkbox" id="menu-toggle" hidden>
 
-            <datalist id="genre_name">
-                <option value="ポップス"></option>
-                <option value="キッズ"></option>
-                <option value="アニメ"></option>
-                <option value="ボーカロイド"></option>
-                <option value="ゲームミュージック"></option>
-                <option value="バラエティ"></option>
-                <option value="クラシック"></option>
-                <option value="ナムコオリジナル"></option>
-            </datalist>
-            <hr>
-        </div>
-        <div>
-            ゲージの条件
-            赤条件:<input type="number" min="1" max="100" value="100" name="gauge_red">
-            金条件:<input type="number" min="1" max="100" value="100" name="gauge_gold">
-        </div>
-        <div>
-            条件1<br>
-            <input type="radio" name="theme_genre_01" value="Parfect">良の数
-            <input type="radio" name="theme_genre_01" value="Good">可の数
-            <input type="radio" name="theme_genre_01" value="Miss">不可の数
-            <input type="radio" name="theme_genre_01" value="Roll">連打の数
-            <input type="radio" name="theme_genre_01" value="Score">スコアの数
-            <input type="radio" name="theme_genre_01" value="Combo">最大コンボ数の数
-            <div id="borderInputs_01">
-                赤条件:<input type="number" name="red_number_01" min="0">
-                金条件:<input type="number" name="gold_number_01" min="0">
-            </div>
-            <input type="checkbox" value="theme_cotinuous_01" id="theme_cotinuous_01">個別条件にする
-            <p/>
+        <label class="menu-icon" for="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
 
-            条件2<br>
-            <input type="radio" name="theme_genre_02" value="parfect">良の数
-            <input type="radio" name="theme_genre_02" value="good">可の数
-            <input type="radio" name="theme_genre_02" value="miss">不可の数
-            <input type="radio" name="theme_genre_02" value="roll">連打の数
-            <input type="radio" name="theme_genre_02" value="score">スコアの数
-            <input type="radio" name="theme_genre_02" value="combo">最大コンボ数の数
-            <div id="borderInputs_02">
-                赤条件:<input type="number" name="red_number_02" min="0">
-                金条件:<input type="number" name="gold_number_02" min="0">
-            </div>
-            <input type="checkbox" value="theme_cotinuous_02" id="theme_cotinuous_02">個別条件にする
-            <p/>
+        <div class="overlay"></div>
 
-            条件3<br>
-            <input type="radio" name="theme_genre_03" value="parfect">良の数
-            <input type="radio" name="theme_genre_03" value="good">可の数
-            <input type="radio" name="theme_genre_03" value="miss">不可の数
-            <input type="radio" name="theme_genre_03" value="roll">連打の数
-            <input type="radio" name="theme_genre_03" value="score">スコアの数
-            <input type="radio" name="theme_genre_03" value="combo">最大コンボ数の数<br>
-            <div id="borderInputs_03">
-                赤条件:<input type="number" name="red_number_03" min="0">
-                金条件:<input type="number" name="gold_number_03" min="0">
+        <nav class="menu">
+            <ul>
+                <li><a href="#">TaikøNauts 段位道場生成ツール</a></li>
+                <li><a href="tja2json.html">段位tja to Dan.json</a></li>
+                <li><a href="https://github.com/miokamioka/DaniGeneratorTN">github</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main">
+        <h2>TaikøNauts 段位道場作成ツール</h2>
+        <p>TaikøNautsの段位道場で使用するDan.jsonファイルを生成します。</p>
+        <form action="" method="get">
+            <div>
+                段位名:
+                <input type="text" name="dani_title" size="30">
+                <hr>
             </div>
-            <input type="checkbox" value="theme_cotinuous_03" id="theme_cotinuous_03">個別条件にする
-        </div>
-    </form>
-    <input type="button" value="生成する" id="generateJsonBtn">
-    <pre id="jsonResult" style="background:#f4f4f4;padding:1em;"></pre>
+            <div>
+                使用するTJAファイル<br>
+                1曲目:<input type="file" name="tja_01" accept=".tja,.osz">
+                難易度:
+                <input type="radio" name="diff_01" value="easy">かんたん
+                <input type="radio" name="diff_01" value="normal">ふつう
+                <input type="radio" name="diff_01" value="hard">むずかしい
+                <input type="radio" name="diff_01" value="master">おに
+                <input type="radio" name="diff_01" value="another">裏譜面<br>
+                ジャンル:<input list="genre_name" name="genrename_01">
+                <input type="checkbox" name="hiddencheck_01" value="hiddencheck_01">隠し曲にする
+                <p />
+                2曲目:<input type="file" name="tja_02" accept=".tja,.osz">
+                難易度:
+                <input type="radio" name="diff_02" value="easy">かんたん
+                <input type="radio" name="diff_02" value="normal">ふつう
+                <input type="radio" name="diff_02" value="hard">むずかしい
+                <input type="radio" name="diff_02" value="master">おに
+                <input type="radio" name="diff_02" value="another">裏譜面<br>
+                ジャンル:<input list="genre_name" name="genrename_02">
+                <input type="checkbox" name="hiddencheck_02" value="hiddencheck_02">隠し曲にする
+                <p />
+                3曲目:<input type="file" name="tja_03" accept=".tja,.osz">
+                難易度:
+                <input type="radio" name="diff_03" value="easy">かんたん
+                <input type="radio" name="diff_03" value="normal">ふつう
+                <input type="radio" name="diff_03" value="hard">むずかしい
+                <input type="radio" name="diff_03" value="master">おに
+                <input type="radio" name="diff_03" value="another">裏譜面<br>
+                ジャンル:<input list="genre_name" name="genrename_03">
+                <input type="checkbox" name="hiddencheck_03" value="hiddencheck_03">隠し曲にする
+
+                <datalist id="genre_name">
+                    <option value="ポップス"></option>
+                    <option value="キッズ"></option>
+                    <option value="アニメ"></option>
+                    <option value="ボーカロイド"></option>
+                    <option value="ゲームミュージック"></option>
+                    <option value="バラエティ"></option>
+                    <option value="クラシック"></option>
+                    <option value="ナムコオリジナル"></option>
+                </datalist>
+                <hr>
+            </div>
+            <div>
+                ゲージの条件
+                赤条件:<input type="number" min="1" max="100" value="100" name="gauge_red">
+                金条件:<input type="number" min="1" max="100" value="100" name="gauge_gold">
+            </div>
+            <div>
+                条件1<br>
+                <input type="radio" name="theme_genre_01" value="Parfect">良の数
+                <input type="radio" name="theme_genre_01" value="Good">可の数
+                <input type="radio" name="theme_genre_01" value="Miss">不可の数
+                <input type="radio" name="theme_genre_01" value="Roll">連打の数
+                <input type="radio" name="theme_genre_01" value="Score">スコアの数
+                <input type="radio" name="theme_genre_01" value="Combo">最大コンボ数の数
+                <div id="borderInputs_01">
+                    赤条件:<input type="number" name="red_number_01" min="0">
+                    金条件:<input type="number" name="gold_number_01" min="0">
+                </div>
+                <input type="checkbox" value="theme_cotinuous_01" id="theme_cotinuous_01">個別条件にする
+                <p />
+
+                条件2<br>
+                <input type="radio" name="theme_genre_02" value="parfect">良の数
+                <input type="radio" name="theme_genre_02" value="good">可の数
+                <input type="radio" name="theme_genre_02" value="miss">不可の数
+                <input type="radio" name="theme_genre_02" value="roll">連打の数
+                <input type="radio" name="theme_genre_02" value="score">スコアの数
+                <input type="radio" name="theme_genre_02" value="combo">最大コンボ数の数
+                <div id="borderInputs_02">
+                    赤条件:<input type="number" name="red_number_02" min="0">
+                    金条件:<input type="number" name="gold_number_02" min="0">
+                </div>
+                <input type="checkbox" value="theme_cotinuous_02" id="theme_cotinuous_02">個別条件にする
+                <p />
+
+                条件3<br>
+                <input type="radio" name="theme_genre_03" value="parfect">良の数
+                <input type="radio" name="theme_genre_03" value="good">可の数
+                <input type="radio" name="theme_genre_03" value="miss">不可の数
+                <input type="radio" name="theme_genre_03" value="roll">連打の数
+                <input type="radio" name="theme_genre_03" value="score">スコアの数
+                <input type="radio" name="theme_genre_03" value="combo">最大コンボ数の数<br>
+                <div id="borderInputs_03">
+                    赤条件:<input type="number" name="red_number_03" min="0">
+                    金条件:<input type="number" name="gold_number_03" min="0">
+                </div>
+                <input type="checkbox" value="theme_cotinuous_03" id="theme_cotinuous_03">個別条件にする
+            </div>
+        </form>
+        <input type="button" value="生成する" id="generateJsonBtn">
+        <pre id="jsonResult" style="background:#f4f4f4;padding:1em;"></pre>
+    </div>
 </body>
 
 </html>
