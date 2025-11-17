@@ -95,13 +95,6 @@ document.getElementById('generateJsonBtn').onclick = function () {
         }
     }
 
-    function mapThemeGenre(value) {
-        if (!value) return "";
-        if (value === 'parfect') return 'Perfect';
-        // 1文字目を大文字化
-        return value.charAt(0).toUpperCase() + value.slice(1);
-    }
-
     // --- JSON構築 ---
 
     const result = {
@@ -122,7 +115,7 @@ document.getElementById('generateJsonBtn').onclick = function () {
             getValue('genrename_03')
         ],
         tja_Hidden: [
-            isChecked('hiddencheck_01'), // name属性で検索 (正しい)
+            isChecked('hiddencheck_01'),
             isChecked('hiddencheck_02'),
             isChecked('hiddencheck_03')
         ],
@@ -142,6 +135,7 @@ document.getElementById('generateJsonBtn').onclick = function () {
         },
         theme_Borders: []
     };
+
 
     // --- theme_Borders の構築ロジック ---
     for (let i = 1; i <= 3; i++) {
@@ -191,18 +185,12 @@ document.getElementById('generateJsonBtn').onclick = function () {
 
 
 
-
+// ラジオボタンの無効化
 document.addEventListener('DOMContentLoaded', () => {
-    // 対象となるラジオボタンのname属性のリスト
     const radioGroupNames = ['theme_genre_01', 'theme_genre_02', 'theme_genre_03'];
-
-    /**
-     * ラジオボタンの無効化状態を更新する関数
-     */
     function updateRadioDisabledState() {
 
         // 3つのグループで現在選択されている値のリストを作成
-        // (例: ['parfect', 'good', null] のようになり、未選択は null)
         const selectedValues = radioGroupNames.map(name => {
             const checkedRadio = document.querySelector(`input[name="${name}"]:checked`);
             return checkedRadio ? checkedRadio.value : null;
@@ -221,10 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isSelectedElsewhere = selectedValues.includes(radio.value);
 
                 if (isSelectedElsewhere) {
-                    // 他（または自身）のグループで選択されている場合
-
-                    // それが自分自身の選択値で *ない* 場合のみ無効化する
-                    // (自分自身が選択しているものは無効化しない)
+                    // それが自分自身の選択値でない場合のみ無効化する
                     radio.disabled = (radio.value !== currentValue);
                 } else {
                     // どのグループでも選択されていない項目は、必ず有効化する
@@ -239,7 +224,5 @@ document.addEventListener('DOMContentLoaded', () => {
         // 各ラジオボタンに「変更」イベントリスナーを追加
         radio.addEventListener('change', updateRadioDisabledState);
     });
-
-    // ページ読み込み時にも一度実行（初期状態を反映するため）
     updateRadioDisabledState();
 });

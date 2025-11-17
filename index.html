@@ -10,6 +10,9 @@
         content="TaikøNautsの段位道場で使用するDan.jsonファイルを生成します。"
     />
     <script src="main.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet"> 
 </head>
 
 <body>
@@ -72,15 +75,15 @@
         </div>
         <div>
             条件1<br>
-            <input type="radio" name="theme_genre_01" value="parfect">良の数
-            <input type="radio" name="theme_genre_01" value="good">可の数
-            <input type="radio" name="theme_genre_01" value="miss">不可の数
-            <input type="radio" name="theme_genre_01" value="roll">連打の数
-            <input type="radio" name="theme_genre_01" value="score">スコアの数
-            <input type="radio" name="theme_genre_01" value="combo">最大コンボ数の数
+            <input type="radio" name="theme_genre_01" value="Parfect">良の数
+            <input type="radio" name="theme_genre_01" value="Good">可の数
+            <input type="radio" name="theme_genre_01" value="Miss">不可の数
+            <input type="radio" name="theme_genre_01" value="Roll">連打の数
+            <input type="radio" name="theme_genre_01" value="Score">スコアの数
+            <input type="radio" name="theme_genre_01" value="Combo">最大コンボ数の数
             <div id="borderInputs_01">
-                赤条件:<input type="number" name="red_number_01" min="1">
-                金条件:<input type="number" name="gold_number_01" min="1">
+                赤条件:<input type="number" name="red_number_01" min="0">
+                金条件:<input type="number" name="gold_number_01" min="0">
             </div>
             <input type="checkbox" value="theme_cotinuous_01" id="theme_cotinuous_01">個別条件にする
             <p/>
@@ -93,8 +96,8 @@
             <input type="radio" name="theme_genre_02" value="score">スコアの数
             <input type="radio" name="theme_genre_02" value="combo">最大コンボ数の数
             <div id="borderInputs_02">
-                赤条件:<input type="number" name="red_number_02" min="1">
-                金条件:<input type="number" name="gold_number_02" min="1">
+                赤条件:<input type="number" name="red_number_02" min="0">
+                金条件:<input type="number" name="gold_number_02" min="0">
             </div>
             <input type="checkbox" value="theme_cotinuous_02" id="theme_cotinuous_02">個別条件にする
             <p/>
@@ -107,8 +110,8 @@
             <input type="radio" name="theme_genre_03" value="score">スコアの数
             <input type="radio" name="theme_genre_03" value="combo">最大コンボ数の数<br>
             <div id="borderInputs_03">
-                赤条件:<input type="number" name="red_number_03" min="1">
-                金条件:<input type="number" name="gold_number_03" min="1">
+                赤条件:<input type="number" name="red_number_03" min="0">
+                金条件:<input type="number" name="gold_number_03" min="0">
             </div>
             <input type="checkbox" value="theme_cotinuous_03" id="theme_cotinuous_03">個別条件にする
         </div>
