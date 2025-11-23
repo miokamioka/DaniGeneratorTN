@@ -105,9 +105,11 @@ function renderEditor(data) {
         const tdDiff = document.createElement('td');
         const inputDiff = document.createElement('input');
         inputDiff.type = 'number';
+        inputDiff.min = 0;
+        inputDiff.max = 4;
         inputDiff.value = song.difficulty; // ここで解析された難易度を表示
         inputDiff.addEventListener('input', (e) => {
-            song.difficulty = parseInt(e.target.value, 3) || 0;
+            song.difficulty = parseInt(e.target.value, 5) || 0;
             updatePreview();
         });
         tdDiff.appendChild(inputDiff);
@@ -302,7 +304,7 @@ function parseTjaStructure(tjaContent) {
 
             result.danSongs.push({
                 path: path,
-                difficulty: diff, // tja_diffの値
+                difficulty: diff,
                 genre: parts[2] || "N/A",
                 isHidden: isHidden, // tja_hiddenの値
                 branchLock: "None"
