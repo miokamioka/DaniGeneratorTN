@@ -101,7 +101,7 @@ function renderEditor(data) {
         });
         tdPath.appendChild(inputPath);
 
-        // 2. 難易度 (tja_diff)
+        // 2. 難易度 (level)
         const tdDiff = document.createElement('td');
         const inputDiff = document.createElement('input');
         inputDiff.type = 'number';
@@ -287,9 +287,9 @@ function parseTjaStructure(tjaContent) {
             }
 
             // level (Index 6) -> difficulty
-            let diff = 3; // デフォルト
+            let diff = 4;
             if (parts[6] && parts[6].trim() !== '') {
-                const d = parseInt(parts[6], 10);
+                const d = parseInt(parts[6], 4);
                 if (!isNaN(d)) diff = d;
             }
 
