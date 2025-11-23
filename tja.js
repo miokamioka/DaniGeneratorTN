@@ -1,232 +1,333 @@
 // --- 設定 ---
 const TJA_PARSER_SETTINGS = {
-    /* tja_Pathの拡張子の有無(true=付ける) */
-    APPEND_TJA_EXTENSION: true,
-
-    /* theme_Gauge の値(red/gold)に.0を付けるか(true=付ける) */
-    APPEND_GAUGE_DECIMAL_STRING: true
+    APPEND_TJA_EXTENSION: true, // .tjaを自動付与するか
 };
 
+// 現在のデータ状態を保持する変数
+let currentData = null;
+
+// --- DOM要素 ---
+const fileInput = document.getElementById('tjaFile');
+const editorArea = document.getElementById('editorArea');
+const inputTitle = document.getElementById('inputTitle');
+const songListBody = document.getElementById('songListBody');
+const previewElem = document.getElementById('preview');
+const downloadBtn = document.getElementById('downloadBtn');
+
+// --- イベントリスナー ---
+document.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+// DD処理
+document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].name.endsWith('.tja')) {
+        // input[type=file]と同じ処理を呼び出す
+        document.getElementById('tjaFile').files = files;
+        // 必要ならchangeイベントを発火
+        document.getElementById('tjaFile').dispatchEvent(new Event('change'));
+    }
+});
+
+// ファイル選択時
+fileInput.addEventListener('change', (evt) => {
+    const file = evt.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            // TJA解析
+            currentData = parseTjaStructure(e.target.result);
+
+            // UIへの反映 (エディタ構築)
+            renderEditor(currentData);
+
+            // プレビュー更新
+            updatePreview();
+
+            // エディタ表示とボタン有効化
+            editorArea.style.display = 'block';
+            downloadBtn.disabled = false;
+
+        } catch (error) {
+            alert("解析エラー: " + error.message);
+            console.error(error);
+        }
+    };
+    reader.readAsText(file, 'Shift_JIS'); // 必要に応じて Shift_JIS に変更
+});
+
+// タイトル変更時
+inputTitle.addEventListener('input', () => {
+    if (!currentData) return;
+    currentData.title = inputTitle.value;
+    // タイトルが変わったら段位インデックスも再計算
+    currentData.danIndex = getDanIndex(currentData.title);
+    updatePreview();
+});
+
+// JSON保存ボタン
+downloadBtn.addEventListener('click', () => {
+    if (!currentData) return;
+    const jsonStr = JSON.stringify(constructFinalJson(currentData), null, 2);
+    downloadContent(jsonStr, "Dan.json", "application/json");
+});
+
+// --- ロジック関数 ---
 
 /**
- * EXAMタイプをジャンル名に変換します。
- * @param {string} type - EXAMタイプ (例: "jg", "jb", "r")
- * @returns {string} ジャンル名 (例: "Good", "Miss", "Roll")
+ * データをもとに編集用フォーム（テーブル）を描画する
  */
-function mapExamType(type) {
-    const examTypeMap = {
-        'g': 'Gauge',       // ゲージ
-        'jp': 'Perfect',    // 良の数
-        'jg': 'Good',       // 可の数
-        'jb': 'Miss',       // 不可の数
-        'r': 'Roll',        // 連打の数
-        's': 'Score',       // スコア
-        'c': 'Combo',       // コンボの数
-        // 'h': 'Hit',      // 叩けた数(実装未定)
-    };
-    return examTypeMap[type] || type.toUpperCase(); // マップにない場合は大文字化
+function renderEditor(data) {
+    inputTitle.value = data.title;
+    songListBody.innerHTML = '';
+
+    data.danSongs.forEach((song, index) => {
+        const tr = document.createElement('tr');
+
+        // 1. ファイル名
+        const tdPath = document.createElement('td');
+        const inputPath = document.createElement('input');
+        inputPath.type = 'text';
+        inputPath.value = song.path;
+        inputPath.addEventListener('input', (e) => {
+            song.path = e.target.value;
+            updatePreview();
+        });
+        tdPath.appendChild(inputPath);
+
+        // 2. 難易度 (tja_diff)
+        const tdDiff = document.createElement('td');
+        const inputDiff = document.createElement('input');
+        inputDiff.type = 'number';
+        inputDiff.value = song.difficulty; // ここで解析された難易度を表示
+        inputDiff.addEventListener('input', (e) => {
+            song.difficulty = parseInt(e.target.value, 3) || 0;
+            updatePreview();
+        });
+        tdDiff.appendChild(inputDiff);
+
+        // 3. ジャンル
+        const tdGenre = document.createElement('td');
+        const inputGenre = document.createElement('input');
+        inputGenre.type = 'text';
+        inputGenre.value = song.genre;
+        inputGenre.addEventListener('input', (e) => {
+            song.genre = e.target.value;
+            updatePreview();
+        });
+        tdGenre.appendChild(inputGenre);
+
+        // 4. ？？？ (isHidden) - チェックボックス
+        const tdHidden = document.createElement('td');
+        const inputHidden = document.createElement('input');
+        inputHidden.type = 'checkbox';
+        inputHidden.checked = song.isHidden;
+        inputHidden.addEventListener('change', (e) => {
+            song.isHidden = e.target.checked;
+            updatePreview();
+        });
+        tdHidden.appendChild(inputHidden);
+
+        // 5. 分岐設定 (BranchLock)
+        const tdBranch = document.createElement('td');
+        const selectBranch = document.createElement('select');
+        const options = ["None", "Normal", "Advanced", "Master"];
+        options.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt;
+            el.textContent = opt;
+            if (song.branchLock === opt) el.selected = true;
+            selectBranch.appendChild(el);
+        });
+        selectBranch.addEventListener('change', (e) => {
+            song.branchLock = e.target.value;
+            updatePreview();
+        });
+        tdBranch.appendChild(selectBranch);
+
+        tr.appendChild(tdPath);
+        tr.appendChild(tdDiff);
+        tr.appendChild(tdGenre);
+        tr.appendChild(tdHidden); // 追加
+        tr.appendChild(tdBranch);
+
+        songListBody.appendChild(tr);
+    });
 }
 
 /**
- * 文字列をファイルとしてダウンロードします。
- * @param {string} content - ダウンロードする文字列
- * @param {string} fileName - ファイル名
- * @param {string} mimeType - MIMEタイプ
+ * 現在のデータからJSONを生成してプレビューエリアに表示
  */
+function updatePreview() {
+    if (!currentData) return;
+    const finalObj = constructFinalJson(currentData);
+    previewElem.textContent = JSON.stringify(finalObj, null, 2);
+}
+
+/**
+ * 内部データ構造から最終的なJSONオブジェクトを組み立てる
+ */
+function constructFinalJson(data) {
+    // conditionsMap を配列に変換
+    const finalConditions = [];
+    if (data.conditionsMap) {
+        for (const [type, thresholds] of data.conditionsMap.entries()) {
+            finalConditions.push({
+                type: type,
+                threshold: thresholds
+            });
+        }
+    }
+
+    return {
+        title: data.title,
+        danIndex: data.danIndex,
+        danPlatePath: data.danPlatePath,
+        danPanelSidePath: data.danPanelSidePath,
+        danTitlePlatePath: data.danTitlePlatePath,
+        danMiniPlatePath: data.danMiniPlatePath,
+        danSongs: data.danSongs,
+        conditionGauge: data.conditionGauge,
+        conditions: finalConditions
+    };
+}
+
+// --- パーサロジック ---
+
+function getDanIndex(title) {
+    const map = {
+        "五級": 0, "四級": 1, "三級": 2, "二級": 3, "一級": 4,
+        "初段": 5, "二段": 6, "三段": 7, "四段": 8, "五段": 9,
+        "六段": 10, "七段": 11, "八段": 12, "九段": 13, "十段": 14,
+        "玄人": 15, "名人": 16, "超人": 17, "達人": 18
+    };
+    // 他の文字が書かれていた場合、外伝になる。
+    return map[title] !== undefined ? map[title] : 19;
+}
+
+function mapConditionType(type) {
+    // 条件設定
+    const map = {
+        'jg': 'good',
+        'jb': 'miss',
+        'r': 'roll',
+        'jp': 'perfect',
+        's': 'score',
+        'h': 'hit',
+        'c': 'combo'
+    };
+    return map[type] || type;
+}
+
 function downloadContent(content, fileName, mimeType) {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = fileName;
-
     document.body.appendChild(a);
     a.click();
-
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
-/**
- * TJAファイルの内容を解析し、dan.jsonフォーマットに変換します。
- * @param {string} tjaContent - TJAファイルの中身
- * @returns {string} 生成されたJSON文字列
- * @throws {Error} TJAファイルが段位道場でない場合にエラーをスローする
- */
-function parseTjaToDanJson(tjaContent) {
+// --- TJA Parser Logic ---
+function parseTjaStructure(tjaContent) {
     const lines = tjaContent.split('\n');
-
-    // --- COURSE検証 ---
     let courseValid = false;
     let courseFound = false;
+
+    // COURSEチェック
     for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('COURSE:')) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('COURSE:')) {
             courseFound = true;
-            const courseValue = trimmedLine.substring(7).trim();
-            // COURSEが段位道場か？
-            if (courseValue === '6' || courseValue.toLowerCase() === 'dan') {
-                courseValid = true;
-            }
-            break; // COURSE行を見つけたら検証終了
+            const val = trimmed.substring(7).trim().toLowerCase();
+            if (val === '6' || val === 'dan') courseValid = true;
+            break;
         }
     }
+    if (!courseFound) throw new Error("COURSE行が見つかりません。");
+    if (!courseValid) throw new Error("COURSEが6(段位)またはDanではありません。");
 
-    if (!courseFound) {
-        throw new Error("エラー！ COURSEが見つかりません。");
-    }
-    if (!courseValid) {
-        throw new Error("エラー！ 段位道場のtjaではありません。");
-    }
-
-
-    // dan.jsonの雛形
-    const danJson = {
-        title: "HOGEHOGE",
-        tja_Path: [],
-        tja_Diff: [],
-        tja_Genre: [], // TJAのジャンル
-        tja_Hidden: [],
-        theme_Genre: [], // EXAMのジャンル
-        theme_continuous: [],
-        theme_Gauge: {
-            red: 100.0,
-            gold: 100.0
-        },
-        theme_Borders: []
+    const result = {
+        title: "",
+        danIndex: 19,
+        danPlatePath: "Plate.png",
+        danPanelSidePath: "panelside.png",
+        danTitlePlatePath: "titleplate.png",
+        danMiniPlatePath: "miniplate.png",
+        danSongs: [],
+        conditionGauge: { red: 0, gold: 0 },
+        conditionsMap: new Map()
     };
 
-    const examMap = new Map(); // EXAMの条件を蓄積
-
     for (const line of lines) {
-        const trimmedLine = line.trim();
+        const trimmed = line.trim();
 
-        if (trimmedLine.startsWith('TITLE:')) {
-            danJson.title = trimmedLine.substring(6).trim();
+        if (trimmed.startsWith('TITLE:')) {
+            result.title = trimmed.substring(6).trim();
+            result.danIndex = getDanIndex(result.title);
 
-        } else if (trimmedLine.startsWith('#NEXTSONG')) {
-            const parts = trimmedLine.substring(10).trim().split(',');
-            // tja_Path (設定に応じて .tja を付与)
+        } else if (trimmed.startsWith('#NEXTSONG')) {
+            // フォーマット:
+            // Path(0), Sub(1), Genre(2), Wave(3), Init(4), Diff(5), Level(6), tja_diff(7), tja_hidden(8)
+            const parts = trimmed.substring(10).trim().split(',');
+
+            // Path
             let path = parts[0] || "N/A";
-            if (TJA_PARSER_SETTINGS.APPEND_TJA_EXTENSION) {
+            if (TJA_PARSER_SETTINGS.APPEND_TJA_EXTENSION && !path.toLowerCase().endsWith('.tja')) {
                 path += ".tja";
             }
-            danJson.tja_Path.push(path);
 
-            danJson.tja_Genre.push(parts[2] || "N/A");
-            // tja_diff (8番目の要素) - 指定がなければおに譜面を指定
-            let diff = 3; // デフォルト値を3に設定
-            if (parts[7] && parts[7].trim() !== '') {
-                const parsedDiff = parseInt(parts[7], 10);
-                if (!isNaN(parsedDiff)) {
-                    diff = parsedDiff; // 有効な数値があれば上書き
-                }
+            // level (Index 6) -> difficulty
+            let diff = 3; // デフォルト
+            if (parts[6] && parts[6].trim() !== '') {
+                const d = parseInt(parts[6], 10);
+                if (!isNaN(d)) diff = d;
             }
-            danJson.tja_Diff.push(diff);
 
-            // tja_hidden(trueがあるか)
-            danJson.tja_Hidden.push(parts[8] === 'true');
+            // tja_hidden (Index 8) -> isHidden
+            // 文字列 "true" かどうかを確認
+            let isHidden = false;
+            if (parts[8] && parts[8].trim() === 'true') {
+                isHidden = true;
+            }
 
-        } else if (trimmedLine.startsWith('EXAM')) {
-            // EXAM1:g,100,100,m
-            const parts = trimmedLine.split(':')[1]?.trim().split(',');
-            if (!parts) continue;
+            result.danSongs.push({
+                path: path,
+                difficulty: diff, // tja_diffの値
+                genre: parts[2] || "N/A",
+                isHidden: isHidden, // tja_hiddenの値
+                branchLock: "None"
+            });
 
-            const type = parts[0];
-            const redStr = parts[1];
-            const goldStr = parts[2];
+        } else if (trimmed.startsWith('EXAM')) {
+            const body = trimmed.split(':')[1];
+            if (!body) continue;
+            const parts = body.trim().split(',');
+            const typeRaw = parts[0];
+            const red = parseFloat(parts[1]);
+            const gold = parseFloat(parts[2]);
 
-            if (type === 'g') {
-                if (TJA_PARSER_SETTINGS.APPEND_GAUGE_DECIMAL_STRING) {
-                    // ゲージ条件(.0 を付与する文字型)
-                    danJson.theme_Gauge = {
-                        red: redStr + ".0",
-                        gold: goldStr + ".0"
-                    };
-                } else {
-                    // ゲージ条件(数値としてパース)
-                    const red = parseFloat(redStr);
-                    const gold = parseFloat(goldStr);
-                    if (isNaN(red) || isNaN(gold)) continue;
-                    danJson.theme_Gauge = { red, gold };
-                }
+            if (isNaN(red) || isNaN(gold)) continue;
+
+            if (typeRaw === 'g') {
+                result.conditionGauge = { red, gold };
             } else {
-                // 個別条件 (数値としてパース)
-                const red = parseFloat(redStr);
-                const gold = parseFloat(goldStr);
-
-                if (isNaN(red) || isNaN(gold)) continue;
-
-                if (!examMap.has(type)) {
-                    examMap.set(type, {
-                        genre: mapExamType(type),
-                        values: []
-                    });
+                const type = mapConditionType(typeRaw);
+                if (!result.conditionsMap.has(type)) {
+                    result.conditionsMap.set(type, []);
                 }
-                examMap.get(type).values.push({ red, gold });
+                result.conditionsMap.get(type).push({ red, gold });
             }
         }
     }
-
-    // 蓄積したEXAM条件をJSONに整形
-    for (const [type, data] of examMap.entries()) {
-        danJson.theme_Genre.push(data.genre);
-
-        // 継続性の判断: EXAMが1回だけ定義されていればtrue (継続)、複数回ならfalse (楽曲別)
-        const isContinuous = data.values.length === 1;
-        danJson.theme_continuous.push(isContinuous);
-
-        danJson.theme_Borders.push({ values: data.values });
-    }
-
-    return JSON.stringify(danJson, null, 2);
+    return result;
 }
-
-/**
- * フォームが送信されたときの処理
- * @param {Event} evt - イベントオブジェクト
- */
-function handleFileSubmit(evt) {
-    evt.preventDefault(); // フォームの送信（リロード）をキャンセル
-
-    const fileInput = document.getElementById('tjaFile');
-    const outputElement = document.getElementById('output');
-
-    if (fileInput.files.length === 0) {
-        outputElement.textContent = "ファイルが選択されていません。";
-        return;
-    }
-
-    const file = fileInput.files[0];
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-        try {
-            const content = e.target.result;
-            const jsonResult = parseTjaToDanJson(content);
-
-            // 画面に表示
-            outputElement.textContent = jsonResult;
-
-            // ファイルとしてダウンロード
-            downloadContent(jsonResult, "Dan.json", "application/json;charset=utf-8;");
-
-        } catch (error) {
-            console.error("Error parsing TJA file:", error);
-            // 変換エラー（COURSE検証エラーなど）を画面に表示
-            outputElement.textContent = "変換エラー:\n" + error.message;
-        }
-    };
-
-    reader.onerror = () => {
-        outputElement.textContent = "ファイルの読み込みに失敗しました。";
-    };
-
-    // 大体ANSIでしょ。UTF-8(BOM付)？知らない子ですね…
-    reader.readAsText(file, 'Shift_JIS');
-}
-
-// フォームのsubmitイベントを監視
-document.getElementById('tjaForm').addEventListener('submit', handleFileSubmit);

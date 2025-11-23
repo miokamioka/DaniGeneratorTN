@@ -1,0 +1,158 @@
+:root {
+    --primary-color: #007bff;
+    --bg-color: #f8f9fa;
+    --text-color: #333;
+    --pane-bg: #fff;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* メインエリア */
+.main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100vh;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+/* ペインレイアウト */
+.panes {
+    display: flex;
+    flex-grow: 1;
+    gap: 20px;
+    overflow: hidden;
+    /* コンテンツが多い場合のスクロール制御用 */
+}
+
+/* 左ペイン (操作・編集) */
+.pane-left {
+    flex: 1;
+    background: var(--pane-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 右ペイン (プレビュー) */
+.pane-right {
+    flex: 1;
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* フォーム要素 */
+input[type="file"] {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #eee;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 編集テーブル */
+.song-edit-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.song-edit-table th,
+.song-edit-table td {
+    border-bottom: 1px solid #eee;
+    padding: 8px;
+    text-align: left;
+}
+
+.song-edit-table th {
+    background: #f1f1f1;
+}
+
+.song-edit-table input[type="text"],
+.song-edit-table input[type="number"],
+.song-edit-table select {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* 保存ボタン */
+.save-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: auto;
+    /* 下部に配置 */
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+.save-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* JSONプレビュー */
+pre#preview {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Consolas', 'Monaco', monospace;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.header-controls {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}

@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="utf-8">
-    <title>TaikøNauts 段位tjaからjsonに変換</title>
-    <meta property="og:title" content="TaikøNauts 段位tjaからjsonに変換" />
+    <title>danitja2json</title>
+    <meta property="og:title" content="danitja2json" />
     <meta property="og:description"
         content="TJAP3-DRW/OpTk/TNDEで使われていたtjaファイルでの段位フォーマットをTaikøNautsで使用するDan.jsonファイルに変換します。" />
     <link rel="stylesheet" href="main.css">
-    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="tja2json.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
@@ -28,23 +28,66 @@
         <nav class="menu">
             <ul>
                 <li><a href="index.html">TaikøNauts 段位道場生成ツール</a></li>
-                <li><a href="tja2json.html">段位tja to Dan.json</a></li>
+                <li><a href="tja2json.html">danitja2json</a></li>
                 <li><a href="https://github.com/miokamioka/DaniGeneratorTN">github</a></li>
             </ul>
         </nav>
     </div>
     <div class="main">
-        <h2>TaikøNauts 段位tjaからjsonに変換</h2>
+        <h2>danitja2json</h2>
         <p>TJAP3-DRW/OpTk/TNDEで使われていたtjaファイルでの段位フォーマットをTaikøNautsで使用するDan.jsonファイルに変換します。</p>
+        <div class="panes">
+            <section class="pane-left">
+                <div id="dropZone" class="drop-zone">
+                    <p>クリックしてファイルを選択<br>(または画面内にドラッグ&ドロップ)</p>
+                    <input type="file" id="tjaFile" accept=".tja">
+                </div>
+
+                <h3>編集</h3>
+                <div id="editorArea" style="display:none;">
+                    <div class="header-controls">
+                        <div class="form-group">
+                            <label>段位タイトル (Title)</label>
+                            <input type="text" id="inputTitle">
+                        </div>
+                    </div>
+
+                    <h4>楽曲リスト (Songs)</h4>
+                    <table class="song-edit-table">
+                        <thead>
+                            <tr>
+                                <th style="width:25%">ファイル名</th>
+                                <th style="width:12%">難しさ</th>
+                                <th style="width:20%">ジャンル</th>
+                                <th style="width:10%">非表示</th>
+                                <th style="width:25%">分岐</th>
+                            </tr>
+                        </thead>
+                        <tbody id="songListBody"></tbody>
+                    </table>
+                </div>
+
+                <button id="downloadBtn" class="save-btn" disabled>JSONを保存（生成）</button>
+            </section>
+
+            <section class="pane-right">
+                <h3>ぷれびゅう↓↓</h3>
+                <pre id="preview">ぷれびゅ～～～～～～だよ</pre>
+            </section>
+        </div>
+        <!--
         <form id="tjaForm">
             <input type="file" id="tjaFile" accept=".tja" required><br>
         <input type="submit" value="生成する">
         </form>
+        
 
         <h2>JSON:</h2>
         <pre id="output">結果がここに表示されます...</pre>
         <script src="tja.js"></script>
+        -->
     </div>
+    <script src="tja.js" defer></script>
 </body>
 
 </html>
