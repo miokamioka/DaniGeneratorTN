@@ -1,7 +1,7 @@
 # DaniGeneratorTN
 TaikoNautsの段位道場jsonを作成する**非公式**ツールです。
 ## アクセス
-[https://miokamioka.github.io/DaniGeneratorTN/](https://miokamioka.github.io/DaniGeneratorTN/tja2json.html) へアクセスしてください。
+[https://miokamioka.github.io/DaniGeneratorTN/](https://miokamioka.github.io/DaniGeneratorTN/tja2json) へアクセスしてください。
 ## 説明
 段位道場作成ツールは公式のものが作成されたため、更新を終了しています。\
 元々ある段位道場tjaをDan.jsonに変換したい場合はdanitja2jsonへ。
